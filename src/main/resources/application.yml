@@ -1,0 +1,59 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ftp-service
+  datasource:
+    hikari:
+      pool-name: FTPServicePool
+      maximum-pool-size: 50 # connections = (core_count * 2) + effective_spindle_count
+      minimum-idle: 20
+      idle-timeout: 60000
+      max-lifetime: 1200000
+      connection-timeout: 5000
+      leak-detection-threshold: 20000
+  security:
+    oauth2:
+      client:
+        registration:
+          ftp-client:
+            client-id: ftp_client
+            client-secret: tester_client
+            authorization-grant-type: client_credentials
+        provider:
+          ftp-client:
+            token-uri: http://103.163.118.212:30829/oauth/token
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info, loggers, httptrace
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+
+ftp:
+  connection:
+    host: 103.163.118.212
+    port: 30210
+    username: atenergy
+    password: atenergy@123
+
+feign-client:
+  tester-service:
+    name: tester-service
+    url: http://103.163.118.212:30830
+    path: /api
+
+logging:
+  level:
+    org.springframework.integration.file: TRACE
+    org.springframework.integration.ftp: TRACE
