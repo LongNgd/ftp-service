@@ -23,5 +23,5 @@ public class LocalVariable {
 
     public static void setToken(String token) {
         LocalVariable.token.set(token);
-    };
+    }
 }

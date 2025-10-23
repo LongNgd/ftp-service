@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 public class ActivityRecordHelper {
     private final ActivityRecordRepository activityRecordRepository;
 
-    public void createActivityRecord(String filePath, ActivityEnum activity) {
+    public void createActivityRecord(String filePath, ActivityEnum activity, String username) {
         activityRecordRepository.save(
                 ActivityRecord.builder()
                         .filePath(filePath)
-                        .username("Demo") // TODO add real user
+                        .username(username) // TODO add real user
                         .dateTime(LocalDateTime.now())
                         .activity(activity)
                         .build()

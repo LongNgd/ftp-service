@@ -26,15 +26,17 @@ public class JsonMapper {
 
     public static <T> T fromJson(String json, Class<T> targetType) {
         try {
-            return (T)objectMapper.readValue(json, targetType);
+            return objectMapper.readValue(json, targetType);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T fromJsonByName(String json, String targetType) {
         try {
-            return (T)objectMapper.readValue(json, Thread.currentThread().getContextClassLoader().loadClass(targetType));
+            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(targetType);
+            return (T) objectMapper.readValue(json, clazz);
         } catch (ClassNotFoundException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -46,6 +48,6 @@ public class JsonMapper {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.setSerializationInclusion(Include.NON_NULL);
 //        objectMapper.registerModule(new Int128Module());
-        objectMapper.registerModule((new Jdk8Module()).configureAbsentsAsNulls(true));
+        objectMapper.registerModule(new Jdk8Module());
     }
 }

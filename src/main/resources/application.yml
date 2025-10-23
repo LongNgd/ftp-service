@@ -18,12 +18,15 @@ spring:
       client:
         registration:
           ftp-client:
-            client-id: ftp_client
-            client-secret: tester_client
+            client-id: ftp-client
+            client-secret: tester-client
             authorization-grant-type: client_credentials
         provider:
           ftp-client:
             token-uri: http://103.163.118.212:30829/oauth/token
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
 
 management:
   tracing:

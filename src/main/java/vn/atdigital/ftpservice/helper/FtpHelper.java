@@ -42,7 +42,6 @@ public class FtpHelper {
 
     public String getPath(Long assetId, String assetType) {
         AttachmentOwnerTypeEnum attachmentOwnerTypeEnum = AttachmentOwnerTypeEnum.fromValue(assetType);
-
         ResponseEntity<String> assetPathResponse = testerClient.getAssetPath(assetId, attachmentOwnerTypeEnum.toString());
         String assetPath = assetPathResponse.getBody();
         Assert.isTrue(assetPath != null, "Cannot get asset path of asset " + assetId + " type " + assetType);

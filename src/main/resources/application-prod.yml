@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/ftp-service
+    url: jdbc:postgresql://localhost:5433/ftp-service
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: long2112
+    password: atenergy
   jpa:
     hibernate:
       ddl-auto: none

@@ -9,9 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
+import vn.atdigital.ftpservice.common.Constants;
+import vn.atdigital.ftpservice.common.ThreadLocalContext;
 import vn.atdigital.ftpservice.common.enums.ActivityEnum;
 import vn.atdigital.ftpservice.common.enums.AttachmentOwnerTypeEnum;
 import vn.atdigital.ftpservice.common.enums.ExtensionEnum;
+import vn.atdigital.ftpservice.domain.dto.ActionUserDTO;
 import vn.atdigital.ftpservice.domain.dto.FtpConnectionDetail;
 import vn.atdigital.ftpservice.domain.model.FileRecord;
 import vn.atdigital.ftpservice.helper.ActivityRecordHelper;
@@ -75,6 +78,7 @@ public class FtpServiceImpl implements FtpService {
     @Transactional
     public String uploadFile(Long assetId, String assetType, MultipartFile file) throws IOException {
         DefaultFtpSessionFactory ftpSessionFactory = ftpHelper.connectFtp(ftpConnectionDetail);
+        ActionUserDTO actionUserDTO = ThreadLocalContext.get(Constants.SESSION_VARIABLE.CURRENT_ACTION_USER, ActionUserDTO.class);
 
         String assetPath = ftpHelper.getPath(assetId, assetType);
 
@@ -94,7 +98,7 @@ public class FtpServiceImpl implements FtpService {
 
             fileRecord = fileRecordRepository.save(fileRecord);
 
-            activityRecordHelper.createActivityRecord(fileRecord.getPath(), ActivityEnum.CREATE);
+            activityRecordHelper.createActivityRecord(fileRecord.getPath(), ActivityEnum.CREATE, actionUserDTO.getUsername());
 
             return remoteFilePath;
         }
@@ -102,13 +106,14 @@ public class FtpServiceImpl implements FtpService {
 
     public byte[] getFile(String filePath) throws IOException {
         DefaultFtpSessionFactory ftpSessionFactory = ftpHelper.connectFtp(ftpConnectionDetail);
+        ActionUserDTO actionUserDTO = ThreadLocalContext.get(Constants.SESSION_VARIABLE.CURRENT_ACTION_USER, ActionUserDTO.class);
 
         Optional<FileRecord> fileRecord = fileRecordRepository.findByPath(filePath);
         Assert.isTrue(fileRecord.isPresent(), "File not found: " + filePath);
 
         try (Session<FTPFile> session = ftpSessionFactory.getSession()) {
             try (InputStream inputStream = session.readRaw(filePath)) {
-                activityRecordHelper.createActivityRecord(fileRecord.get().getPath(), ActivityEnum.DOWNLOAD);
+                activityRecordHelper.createActivityRecord(fileRecord.get().getPath(), ActivityEnum.DOWNLOAD, actionUserDTO.getUsername());
                 return StreamUtils.copyToByteArray(inputStream);
             }
         }
@@ -122,6 +127,7 @@ public class FtpServiceImpl implements FtpService {
     @Transactional
     public void deleteFile(String filePath) throws IOException {
         DefaultFtpSessionFactory ftpSessionFactory = ftpHelper.connectFtp(ftpConnectionDetail);
+        ActionUserDTO actionUserDTO = ThreadLocalContext.get(Constants.SESSION_VARIABLE.CURRENT_ACTION_USER, ActionUserDTO.class);
 
         Optional<FileRecord> fileRecord = fileRecordRepository.findByPath(filePath);
         Assert.isTrue(fileRecord.isPresent(), "File not found: " + filePath);
@@ -129,7 +135,7 @@ public class FtpServiceImpl implements FtpService {
         try (Session<FTPFile> session = ftpSessionFactory.getSession()) {
             session.remove(fileRecord.get().getPath());
             fileRecordRepository.delete(fileRecord.get());
-            activityRecordHelper.createActivityRecord(fileRecord.get().getPath(), ActivityEnum.DELETE);
+            activityRecordHelper.createActivityRecord(fileRecord.get().getPath(), ActivityEnum.DELETE, actionUserDTO.getUsername());
         }
     }
 

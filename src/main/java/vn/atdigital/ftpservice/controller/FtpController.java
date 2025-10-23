@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import vn.atdigital.ftpservice.repository.ActivityRecordRepository;
 import vn.atdigital.ftpservice.service.FtpService;
 
 import java.nio.file.Files;
@@ -21,6 +22,7 @@ import static vn.atdigital.ftpservice.common.Constants.API_RESPONSE.*;
 public class FtpController extends CommonController {
 
     private final FtpService ftpService;
+    private final ActivityRecordRepository activityRecordRepository;
 
     @GetMapping("/list-by-path")
     public ResponseEntity<?> listFiles(
@@ -65,7 +67,7 @@ public class FtpController extends CommonController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFileName + "\"")
                     .body(file);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return toExceptionResult(e.getMessage(), RETURN_CODE_ERROR_NOTFOUND);
         }
     }
 
@@ -128,6 +130,15 @@ public class FtpController extends CommonController {
             return toSuccessResult(fileName, "Delete file successfully");
         } catch (Exception e) {
             return toExceptionResult(e.getMessage(), RETURN_CODE_ERROR);
+        }
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<?> getActivity() {
+        try {
+            return toSuccessResult(activityRecordRepository.findAll(), "Get activity successfully");
+        } catch (Exception e) {
+            return toExceptionResult(e.getMessage(), RETURN_CODE_ERROR_NOTFOUND);
         }
     }
 }
