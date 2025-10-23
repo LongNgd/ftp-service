@@ -17,7 +17,7 @@ public class ActivityRecordHelper {
         activityRecordRepository.save(
                 ActivityRecord.builder()
                         .filePath(filePath)
-                        .username(username) // TODO add real user
+                        .username(username)
                         .dateTime(LocalDateTime.now())
                         .activity(activity)
                         .build()
