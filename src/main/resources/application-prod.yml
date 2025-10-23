@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/ftp-service
+    url: jdbc:postgresql://192.168.127.250:5433/ftp-service
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: atenergy
